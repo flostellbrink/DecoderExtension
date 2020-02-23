@@ -1,4 +1,4 @@
-var copyMenu = chrome.contextMenus.create({
+var menuItem = chrome.contextMenus.create({
     contexts: ["selection"],
     title: "Copy",
     visible: false,
@@ -6,30 +6,22 @@ var copyMenu = chrome.contextMenus.create({
 })
 
 chrome.runtime.onMessage.addListener(
-    function (request) {
-        const parsed = parse(request.selection);
-        chrome.contextMenus.update(copyMenu, parsed)
-    }
-);
+    request => chrome.contextMenus.update(menuItem, decode(request.selection)));
 
-function parse(value) {
-    const decoded = tryDecode(value);
-    if (decoded === null) return { visible: false };
+const writeToClipboard = content =>
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs =>
+        tabs.length ? chrome.tabs.sendMessage(tabs[0].id, { content }) : {});
 
+function decode(value) {
+    try { return parse(atob(value)); }
+    catch { return { visible: false } }
+}
+
+function parse(decoded) {
     try {
         var url = new URL(decoded);
         return { title: `Go to ${url}`, onclick: () => chrome.tabs.update({ url: url.toString() }), visible: true };
     } catch {
-        return { title: `Copy ${decoded}`, onclick: () => navigator.clipboard.writeText(decoded), visible: true };
+        return { title: `Copy ${decoded}`, onclick: () => writeToClipboard(decoded), visible: true };
     }
 }
-
-function tryDecode(selection) {
-    try {
-        return atob(selection)
-    }
-    catch {
-        return null;
-    }
-}
-
