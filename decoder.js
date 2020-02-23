@@ -20,8 +20,8 @@ function decode(value) {
 function parse(decoded) {
     try {
         var url = new URL(decoded);
-        return { title: `Go to ${url}`, onclick: () => chrome.tabs.update({ url: url.toString() }), visible: true };
+        return { title: `Go to "${url}"`, onclick: () => chrome.tabs.update({ url: url.toString() }), visible: true };
     } catch {
-        return { title: `Copy ${decoded}`, onclick: () => writeToClipboard(decoded), visible: true };
+        return { title: `Copy "${decoded}"`, onclick: () => writeToClipboard(decoded), visible: true };
     }
 }
