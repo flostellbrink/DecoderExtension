@@ -3,7 +3,6 @@
     "version": "1.0",
     "description": "Decode selected Base64 text using the context menu.",
     "permissions": [
-        "activeTab",
         "contextMenus"
     ],
     "background": {
